@@ -16,8 +16,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { login } from "../server/actions/userControllers";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
+  const [validEmailPassword, setValidEmailPassword] = useState<boolean | null>(
+    null
+  );
+
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -26,8 +34,20 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof LoginSchema>) => {
-    login(data);
+  const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
+    try {
+      setValidEmailPassword(true);
+      const res = await login(data);
+      if (!res.success) {
+        setValidEmailPassword(false);
+        console.log("Incorrect email or password!");
+      }
+      if (res.success) {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -71,6 +91,9 @@ const LoginForm = () => {
               )}
             />
           </div>
+          <FormMessage>
+            {validEmailPassword === false && "Incorrect email or password!"}
+          </FormMessage>
           <Button
             type="submit"
             className="w-full bg-indigo-700  hover:bg-indigo-600"

@@ -18,8 +18,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { register } from "../server/actions/userControllers";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const [emailExist, setEmailExist] = useState<boolean>();
+
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -30,8 +36,20 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
-    register(data);
+  const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
+    try {
+      setEmailExist(false);
+      const res = await register(data);
+      if (res.error) {
+        console.log(res.error);
+        setEmailExist(true);
+      }
+      if (res.success === true) {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -101,6 +119,7 @@ const RegisterForm = () => {
               )}
             />
           </div>
+          <FormMessage>{emailExist && "Email already registered!"}</FormMessage>
           <Button
             type="submit"
             className="w-full bg-indigo-700 hover:bg-indigo-600"

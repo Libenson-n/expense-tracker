@@ -1,10 +1,13 @@
 "use server";
 
-import { getCollection } from "@/lib/db";
+import connectDB from "@/config/db";
+import UserModel from "@/models/userModel";
 import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
+
+const TOKEN_EXPIRATION = 60 * 60 * 24; // 24 hours
 
 type User = {
   username?: string;
@@ -19,32 +22,39 @@ export const register = async (data: User) => {
     password: bcrypt.hashSync(data.password, 10),
   };
 
-  const usersCollection = await getCollection("users");
-  const existingUser = await usersCollection.findOne({
-    username: user.username,
-  });
+  try {
+    await connectDB();
+    const existingUser = await UserModel.findOne({
+      email: user.email,
+    });
+    if (existingUser) {
+      return { error: "Email already registered!" };
+    }
+    const newUser = await UserModel.create(user);
 
-  if (existingUser) {
-    return { error: "Username already in use!" };
+    const userId = newUser.insertedId;
+
+    const token = jwt.sign(
+      { userId: userId, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 },
+      process.env.JWT_SECRET as string
+    );
+
+    cookies().set("expense-tracker", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: TOKEN_EXPIRATION,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Registration error:", error);
+    if (error instanceof Error) {
+      return { error: error.message };
+    } else {
+      return { error: "An unexpected error occurred." };
+    }
   }
-
-  const newUser = await usersCollection.insertOne(user);
-
-  const userId = newUser.insertedId;
-
-  const token = jwt.sign(
-    { userId: userId, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 },
-    process.env.JWT_SECRET as string
-  );
-
-  cookies().set("expense-tracker", token, {
-    httpOnly: true,
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24,
-    secure: true,
-  });
-
-  redirect("/");
 };
 
 export const logout = async () => {
@@ -55,7 +65,7 @@ export const logout = async () => {
 export const login = async (data: User) => {
   const failObj = {
     success: false,
-    message: "Incorrect username or password",
+    message: "Incorrect email or password",
   };
 
   const user = {
@@ -63,33 +73,42 @@ export const login = async (data: User) => {
     password: data.password,
   };
 
-  const collection = await getCollection("users");
-  const foundUser = await collection.findOne({ email: user.email });
+  try {
+    await connectDB();
+    const foundUser = await UserModel.findOne({ email: user.email });
 
-  if (!foundUser) {
-    return failObj;
+    if (!foundUser) {
+      return failObj;
+    }
+    const matchOrNot = bcrypt.compareSync(user.password, foundUser.password);
+
+    if (!matchOrNot) {
+      return failObj;
+    }
+
+    const token = jwt.sign(
+      {
+        userId: foundUser._id,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+      },
+      process.env.JWT_SECRET as string
+    );
+
+    cookies().set("expense-tracker", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: TOKEN_EXPIRATION,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Login error:", error); // Log the error for debugging
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.",
+    };
   }
-
-  const matchOrNot = bcrypt.compareSync(user.password, foundUser.password);
-
-  if (!matchOrNot) {
-    return failObj;
-  }
-
-  const token = jwt.sign(
-    {
-      userId: foundUser._id,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-    },
-    process.env.JWT_SECRET as string
-  );
-
-  cookies().set("expense-tracker", token, {
-    httpOnly: true,
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24,
-    secure: true,
-  });
-
-  redirect("/");
 };
