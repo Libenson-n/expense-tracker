@@ -31,3 +31,9 @@ export const LoginSchema = z.object({
     message: "Password must be at least 4 characters.",
   }),
 });
+
+export const TransactionSchema = z.object({
+  title: z.string().min(1),
+  amount: z.string().min(1),
+  category: z.string(),
+});
