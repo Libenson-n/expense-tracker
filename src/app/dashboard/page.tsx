@@ -1,14 +1,18 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TransactionForm from "./transaction-form";
+import { validateUserCookie } from "@/lib/getUser";
+import { getTransactions } from "../server/actions/transactionControllers";
 
 const Dashboard = async () => {
   return (
     <main>
-      <Card className="w-3/4 mx-auto mt-10">
+      <Card className="w-1/3 mx-auto mt-10">
         <CardHeader>
-          <CardTitle>Transactions</CardTitle>
-          <TransactionForm />
+          <CardTitle>Add a transaction</CardTitle>
         </CardHeader>
+        <CardContent>
+          <TransactionForm />
+        </CardContent>
       </Card>
     </main>
   );

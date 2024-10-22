@@ -1,7 +1,7 @@
 "use server";
 
 import connectDB from "@/config/db";
-import UserModel from "@/models/userModel";
+import { UserModel } from "@/models";
 import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";

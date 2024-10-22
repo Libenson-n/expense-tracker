@@ -34,6 +34,7 @@ export const LoginSchema = z.object({
 
 export const TransactionSchema = z.object({
   title: z.string().min(1),
-  amount: z.string().min(1),
+  amount: z.coerce.number(),
+  date: z.date(),
   category: z.string(),
 });

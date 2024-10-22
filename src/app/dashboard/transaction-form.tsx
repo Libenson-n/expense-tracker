@@ -23,22 +23,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { addTransaction } from "../server/actions/transactionControllers";
 
 const TransactionForm = () => {
   const form = useForm<z.infer<typeof TransactionSchema>>({
     resolver: zodResolver(TransactionSchema),
     defaultValues: {
       title: "",
-      amount: "",
+      amount: 0,
+      date: new Date(),
       category: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof TransactionSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof TransactionSchema>) => {
+    try {
+      const res = await addTransaction(values);
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -64,11 +75,52 @@ const TransactionForm = () => {
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormDescription>
                   Positive = income / Negative = expense
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -84,20 +136,21 @@ const TransactionForm = () => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Housing">Housing</SelectItem>
-                      <SelectItem value="Food">Food</SelectItem>
-                      <SelectItem value="Car">Car</SelectItem>
-                      <SelectItem value="Utilities">Utilities</SelectItem>
-                      <SelectItem value="Entertainment">
+                      <SelectItem value="housing">Housing</SelectItem>
+                      <SelectItem value="food">Food</SelectItem>
+                      <SelectItem value="car">Car</SelectItem>
+                      <SelectItem value="utilities">Utilities</SelectItem>
+                      <SelectItem value="entertainment">
                         Entertainment
                       </SelectItem>
-                      <SelectItem value="Paycheck">Paycheck</SelectItem>
-                      <SelectItem value="Debt">Debt</SelectItem>
-                      <SelectItem value="Misc.">Misc.</SelectItem>
+                      <SelectItem value="paycheck">Paycheck</SelectItem>
+                      <SelectItem value="work">Work</SelectItem>
+                      <SelectItem value="debt">Debt</SelectItem>
+                      <SelectItem value="misc.">Misc.</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -105,7 +158,7 @@ const TransactionForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="bg-indigo-700">
+          <Button type="submit" className="bg-indigo-700 w-full">
             Add Transaction
           </Button>
         </form>
