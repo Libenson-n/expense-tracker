@@ -4,8 +4,15 @@ import connectDB from "@/config/db";
 import { validateUserCookie } from "@/lib/getUser";
 import { UserModel, TransactionModel } from "@/models";
 import { JwtPayload } from "jsonwebtoken";
+import { revalidatePath } from "next/cache";
 
-export const getTransactions = async (userId: string) => {
+export const getTransactions = async () => {
+  const { userId }: JwtPayload = (await validateUserCookie()) || {};
+  if (!userId) {
+    console.error("User not authenticated");
+    return;
+  }
+
   try {
     await connectDB();
     const foundUser = await UserModel.findById(userId);
@@ -13,6 +20,8 @@ export const getTransactions = async (userId: string) => {
     if (!foundUser) {
       return { error: "You need to be logged in to view transactions" };
     }
+    const transactions = await TransactionModel.find({ userId: userId });
+    return transactions;
   } catch (error) {
     console.log(error);
   }
@@ -37,14 +46,15 @@ export const addTransaction = async (data: AddTransactionProps) => {
     userId: userId,
     title: data.title,
     amount: data.amount,
-    date: data.date,
+    date: data.date.toDateString(),
     category: data.category,
   };
 
-  console.log(newTransaction);
   try {
     await connectDB();
     const res = await TransactionModel.create(newTransaction);
+
+    revalidatePath("/dashboard");
   } catch (error) {
     console.log(error);
   }
