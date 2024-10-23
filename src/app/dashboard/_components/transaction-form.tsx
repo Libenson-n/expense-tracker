@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { addTransaction } from "../server/actions/transactionControllers";
+import { addTransaction } from "../../server/actions/transactionControllers";
 
 const TransactionForm = () => {
   const form = useForm<z.infer<typeof TransactionSchema>>({

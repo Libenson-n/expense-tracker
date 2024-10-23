@@ -60,7 +60,21 @@ export const addTransaction = async (data: AddTransactionProps) => {
   } catch (error) {
     console.error("Error saving transaction:", error);
     if (error instanceof Error) {
-      return { error: error.message };
+      return { "Error saving transaction": error.message };
+    } else {
+      return { error: "An unexpected error occurred." };
+    }
+  }
+};
+
+export const deleteTransaction = async (_id: string) => {
+  try {
+    await connectDB();
+    const res = await TransactionModel.deleteOne({ _id });
+    revalidatePath("/dashboard");
+  } catch (error) {
+    if (error instanceof Error) {
+      return { "Error deleting transaction": error.message };
     } else {
       return { error: "An unexpected error occurred." };
     }

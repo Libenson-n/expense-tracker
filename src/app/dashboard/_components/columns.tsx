@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { deleteTransaction } from "@/app/server/actions/transactionControllers";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -61,7 +62,7 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const transaction = row.original;
 
       return (
         <DropdownMenu>
@@ -72,9 +73,16 @@ export const columns: ColumnDef<Transaction>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            {/* TODO: Add an edit function */}
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button
+                variant="ghost"
+                onClick={() => deleteTransaction(transaction._id)}
+              >
+                Delete
+              </Button>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

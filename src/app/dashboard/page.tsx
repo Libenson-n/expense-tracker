@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import TransactionForm from "./transaction-form";
+import TransactionForm from "./_components/transaction-form";
 import { getTransactions } from "../server/actions/transactionControllers";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { DataTable } from "./_components/data-table";
+import { columns } from "./_components/columns";
 import { Transaction } from "@/types";
 
 const Dashboard = async () => {
@@ -19,8 +19,6 @@ const Dashboard = async () => {
         category: transaction.category,
       })
   );
-
-  console.log(convertToPlainObject);
 
   return (
     <main>
