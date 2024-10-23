@@ -33,6 +33,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { addTransaction } from "../../server/actions/transactionControllers";
+import { toast } from "sonner";
 
 const TransactionForm = () => {
   const form = useForm<z.infer<typeof TransactionSchema>>({
@@ -48,7 +49,9 @@ const TransactionForm = () => {
   const onSubmit = async (values: z.infer<typeof TransactionSchema>) => {
     try {
       const res = await addTransaction(values);
-      console.log(res);
+      if (res?.success) {
+        toast("Transaction saved");
+      }
     } catch (error) {
       console.log(error);
     }

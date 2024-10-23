@@ -21,14 +21,14 @@ const Balance = ({ transactions }: BalanceProps) => {
     .map((t) => t.amount)
     .reduce((total, t) => {
       return total + t;
-    });
+    }, 0);
 
   const income = transactions
     ?.filter((transaction) => transaction.amount > 0)
     .map((t) => t.amount)
     .reduce((total, t) => {
       return total + t;
-    });
+    }, 0);
 
   return (
     <Card>

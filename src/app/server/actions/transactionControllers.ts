@@ -46,7 +46,7 @@ export const addTransaction = async (data: AddTransactionProps) => {
     userId: userId,
     title: data.title,
     amount: data.amount,
-    date: data.amount,
+    date: data.date,
     category: data.category,
   };
 
