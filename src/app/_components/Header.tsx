@@ -7,9 +7,7 @@ const Header = async () => {
 
   return (
     <nav className="flex h-14 items-center justify-between bg-violet-400 px-8 shadow-md">
-      <Link href="/" className="font-extrabold">
-        Expenso
-      </Link>
+      <p>Expenso</p>
       <div className="flex gap-3">{user && <Logout />}</div>
     </nav>
   );
