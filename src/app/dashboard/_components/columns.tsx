@@ -13,6 +13,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteTransaction } from "@/app/server/actions/transactionControllers";
+import { toast } from "sonner";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -37,7 +38,17 @@ export const columns: ColumnDef<Transaction>[] = [
         currency: "USD",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <div
+          className={
+            amount > 0
+              ? "text-green-600 text-right font-medium"
+              : "text-red-600 text-right font-medium"
+          }
+        >
+          {formatted}
+        </div>
+      );
     },
   },
   {
@@ -78,7 +89,10 @@ export const columns: ColumnDef<Transaction>[] = [
             <DropdownMenuItem>
               <Button
                 variant="ghost"
-                onClick={() => deleteTransaction(transaction._id)}
+                onClick={() => {
+                  deleteTransaction(transaction._id);
+                  toast("Transaction Deleted");
+                }}
               >
                 Delete
               </Button>

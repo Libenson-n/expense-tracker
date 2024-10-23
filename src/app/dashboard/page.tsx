@@ -4,6 +4,7 @@ import { getTransactions } from "../server/actions/transactionControllers";
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/columns";
 import { Transaction } from "@/types";
+import Balance from "./_components/balance";
 
 const Dashboard = async () => {
   const transactions: any = await getTransactions();
@@ -14,7 +15,7 @@ const Dashboard = async () => {
         _id: transaction._id.toString(),
         userId: transaction.userId,
         title: transaction.title,
-        amount: transaction.amount,
+        amount: Number(transaction.amount),
         date: transaction.date.toString(),
         category: transaction.category,
       })
@@ -22,26 +23,29 @@ const Dashboard = async () => {
 
   return (
     <main>
-      <Card className="m-6 flex gap-2 p-4">
-        <Card className="w-1/3">
-          <CardHeader>
-            <CardTitle>Add a transaction</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TransactionForm />
-          </CardContent>
+      <div className="m-6">
+        <Balance transactions={convertToPlainObject} />
+        <Card className="flex gap-2 p-4">
+          <Card className="w-1/3">
+            <CardHeader>
+              <CardTitle>Add a transaction</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TransactionForm />
+            </CardContent>
+          </Card>
+          <Card className="w-2/3">
+            <CardHeader>
+              <CardTitle>Transactions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {transactions && (
+                <DataTable columns={columns} data={convertToPlainObject} />
+              )}
+            </CardContent>
+          </Card>
         </Card>
-        <Card className="w-2/3">
-          <CardHeader>
-            <CardTitle>Transactions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {transactions && (
-              <DataTable columns={columns} data={convertToPlainObject} />
-            )}
-          </CardContent>
-        </Card>
-      </Card>
+      </div>
     </main>
   );
 };

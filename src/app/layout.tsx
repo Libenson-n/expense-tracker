@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/Header";
+import { Toaster } from "sonner";
 
 const raleway = Raleway({ subsets: ["latin"], weight: "500" });
 
@@ -19,7 +20,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${raleway.className} antialiased`}>
         <Header />
-        {children}
+        <main>{children}</main>
+        <Toaster />
       </body>
     </html>
   );

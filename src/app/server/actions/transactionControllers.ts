@@ -71,6 +71,7 @@ export const deleteTransaction = async (_id: string) => {
   try {
     await connectDB();
     const res = await TransactionModel.deleteOne({ _id });
+    console.log(res);
     revalidatePath("/dashboard");
   } catch (error) {
     if (error instanceof Error) {
