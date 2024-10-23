@@ -6,10 +6,7 @@ import { logout } from "@/app/server/actions/userControllers";
 const Logout = () => {
   return (
     <form action={logout}>
-      <button
-        type="submit"
-        className="rounded-full bg-indigo-600 p-2 font-semibold text-white"
-      >
+      <button type="submit" className="rounded-md bg-indigo-700 p-2 text-white">
         Log Out
       </button>
     </form>

@@ -7,15 +7,12 @@ const Guest = () => {
         Welcome, please sign in or sign up to start tracking your expenses.
       </h1>
       <div className="flex gap-5">
-        <Link
-          href="/login"
-          className="rounded-full text-xl bg-indigo-600 p-3 font-semibold text-white"
-        >
+        <Link href="/login" className="rounded-md bg-indigo-700 p-2 text-white">
           Sign in
         </Link>
         <Link
           href="/register"
-          className="rounded-full text-xl bg-indigo-600 p-3 font-semibold text-white"
+          className="rounded-md bg-indigo-700 p-2 text-white"
         >
           Sign up
         </Link>

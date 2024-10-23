@@ -23,10 +23,10 @@ const Dashboard = async () => {
 
   return (
     <main>
-      <div className="m-6">
+      <div className="m-6 ">
         <Balance transactions={convertToPlainObject} />
-        <Card className="flex gap-2 p-4">
-          <Card className="w-1/3">
+        <Card className="flex flex-col sm:flex-row gap-2 p-4 ">
+          <Card className="">
             <CardHeader>
               <CardTitle>Add a transaction</CardTitle>
             </CardHeader>
@@ -34,7 +34,7 @@ const Dashboard = async () => {
               <TransactionForm />
             </CardContent>
           </Card>
-          <Card className="w-2/3">
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>Transactions</CardTitle>
             </CardHeader>

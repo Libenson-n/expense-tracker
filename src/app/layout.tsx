@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${raleway.className} antialiased`}>
         <Header />
-        <main>{children}</main>
+        <main className="container bg-white h-screen">{children}</main>
         <Toaster />
       </body>
     </html>

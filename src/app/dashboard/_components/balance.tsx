@@ -33,14 +33,21 @@ const Balance = ({ transactions }: BalanceProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Balance</CardTitle>
-        {total ? (
-          <CardTitle className={total > 0 ? "text-green-600" : "text-red-600"}>
-            {total}
-          </CardTitle>
-        ) : (
-          <CardTitle>No transactions</CardTitle>
-        )}
+        <CardTitle>Overview</CardTitle>
+        <Card className="">
+          <CardHeader>
+            <CardTitle>Balance</CardTitle>
+            {total ? (
+              <CardTitle
+                className={total > 0 ? "text-green-600" : "text-red-600"}
+              >
+                {total}
+              </CardTitle>
+            ) : (
+              <CardTitle>No transactions</CardTitle>
+            )}
+          </CardHeader>
+        </Card>
       </CardHeader>
       <CardContent className="flex gap-3">
         <Card className="w-1/2">
