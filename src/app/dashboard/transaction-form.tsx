@@ -48,7 +48,10 @@ const TransactionForm = () => {
   const onSubmit = async (values: z.infer<typeof TransactionSchema>) => {
     try {
       const res = await addTransaction(values);
-    } catch (error) {}
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

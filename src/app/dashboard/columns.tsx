@@ -52,8 +52,8 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "date",
     header: () => <div className="text-center">Date</div>,
     cell: ({ row }) => {
-      const date: Date = row.getValue("date");
-      const formatted = date.toLocaleDateString();
+      const date: string = row.getValue("date");
+      const formatted = date.slice(0, 10);
 
       return <div className="text-right font-medium">{formatted}</div>;
     },

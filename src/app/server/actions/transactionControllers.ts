@@ -46,7 +46,7 @@ export const addTransaction = async (data: AddTransactionProps) => {
     userId: userId,
     title: data.title,
     amount: data.amount,
-    date: data.date.toDateString(),
+    date: data.amount,
     category: data.category,
   };
 
@@ -55,7 +55,14 @@ export const addTransaction = async (data: AddTransactionProps) => {
     const res = await TransactionModel.create(newTransaction);
 
     revalidatePath("/dashboard");
+
+    return { success: true };
   } catch (error) {
-    console.log(error);
+    console.error("Error saving transaction:", error);
+    if (error instanceof Error) {
+      return { error: error.message };
+    } else {
+      return { error: "An unexpected error occurred." };
+    }
   }
 };

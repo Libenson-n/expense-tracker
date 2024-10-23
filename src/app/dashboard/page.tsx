@@ -1,12 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TransactionForm from "./transaction-form";
 import { getTransactions } from "../server/actions/transactionControllers";
-import { Transaction } from "@/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import { Transaction } from "@/types";
 
 const Dashboard = async () => {
   const transactions: any = await getTransactions();
+
+  const convertToPlainObject = transactions.map(
+    (transaction: Transaction) =>
+      (transaction = {
+        _id: transaction._id.toString(),
+        userId: transaction.userId,
+        title: transaction.title,
+        amount: transaction.amount,
+        date: transaction.date.toString(),
+        category: transaction.category,
+      })
+  );
+
+  console.log(convertToPlainObject);
 
   return (
     <main>
@@ -25,7 +39,7 @@ const Dashboard = async () => {
           </CardHeader>
           <CardContent>
             {transactions && (
-              <DataTable columns={columns} data={transactions} />
+              <DataTable columns={columns} data={convertToPlainObject} />
             )}
           </CardContent>
         </Card>
