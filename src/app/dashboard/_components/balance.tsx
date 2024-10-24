@@ -12,23 +12,24 @@ type BalanceProps = {
 };
 
 const Balance = ({ transactions }: BalanceProps) => {
-  const total = transactions?.reduce((total, transaction) => {
-    return total + transaction.amount;
-  }, 0);
+  const expenses =
+    transactions
+      ?.filter((transaction) => transaction.amount < 0)
+      .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0) || 0;
 
-  const expenses = transactions
-    ?.filter((transaction) => transaction.amount < 0)
-    .map((t) => t.amount)
-    .reduce((total, t) => {
-      return total + t;
-    }, 0);
+  const income =
+    transactions
+      ?.filter((transaction) => transaction.amount > 0)
+      .reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
 
-  const income = transactions
-    ?.filter((transaction) => transaction.amount > 0)
-    .map((t) => t.amount)
-    .reduce((total, t) => {
-      return total + t;
-    }, 0);
+  const total = income - expenses;
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
 
   return (
     <Card>
@@ -37,14 +38,14 @@ const Balance = ({ transactions }: BalanceProps) => {
         <Card className="">
           <CardHeader>
             <CardTitle>Balance</CardTitle>
-            {total ? (
+            {total !== 0 ? (
               <CardTitle
                 className={total > 0 ? "text-green-600" : "text-red-600"}
               >
-                {total}
+                {formatCurrency(total)}
               </CardTitle>
             ) : (
-              <CardTitle>No transactions</CardTitle>
+              <CardDescription>No transactions</CardDescription>
             )}
           </CardHeader>
         </Card>
@@ -53,13 +54,17 @@ const Balance = ({ transactions }: BalanceProps) => {
         <Card className="w-1/2">
           <CardHeader>
             <CardTitle>Income</CardTitle>
-            <CardDescription>{income}</CardDescription>
+            <CardDescription className="text-green-600">
+              {formatCurrency(income)}
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card className="w-1/2">
           <CardHeader>
             <CardTitle>Expenses</CardTitle>
-            <CardDescription>{expenses}</CardDescription>
+            <CardDescription className="text-red-600">
+              {formatCurrency(expenses)}
+            </CardDescription>
           </CardHeader>
         </Card>
       </CardContent>

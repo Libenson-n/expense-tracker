@@ -32,23 +32,31 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { addTransaction } from "../../server/actions/transactionControllers";
+import {
+  addTransaction,
+  updateTransaction,
+} from "../../server/actions/transactionControllers";
 import { toast } from "sonner";
+import { Transaction } from "@/types";
 
-const TransactionForm = () => {
+type EditTransactionProps = {
+  transaction: Transaction;
+};
+
+const EditTransaction = ({ transaction }: EditTransactionProps) => {
   const form = useForm<z.infer<typeof TransactionSchema>>({
     resolver: zodResolver(TransactionSchema),
     defaultValues: {
-      title: "",
-      amount: 0,
+      title: transaction.title,
+      amount: transaction.amount,
       date: new Date(),
-      category: "",
+      category: transaction.category,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof TransactionSchema>) => {
     try {
-      const res = await addTransaction(values);
+      const res = await updateTransaction(transaction._id, values);
       if (res?.success) {
         toast("Transaction saved");
         form.reset({ title: "", amount: 0, date: new Date(), category: "" });
@@ -166,7 +174,7 @@ const TransactionForm = () => {
             )}
           />
           <Button type="submit" className="bg-indigo-700 w-full">
-            Add Transaction
+            Submit
           </Button>
         </form>
       </Form>
@@ -174,4 +182,4 @@ const TransactionForm = () => {
   );
 };
 
-export default TransactionForm;
+export default EditTransaction;

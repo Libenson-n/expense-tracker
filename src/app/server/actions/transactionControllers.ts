@@ -3,6 +3,7 @@
 import connectDB from "@/config/db";
 import { validateUserCookie } from "@/lib/getUser";
 import { UserModel, TransactionModel } from "@/models";
+import { Transaction } from "@/types";
 import { JwtPayload } from "jsonwebtoken";
 import { revalidatePath } from "next/cache";
 
@@ -20,8 +21,20 @@ export const getTransactions = async () => {
     if (!foundUser) {
       return { error: "You need to be logged in to view transactions" };
     }
-    const transactions = await TransactionModel.find({ userId: userId });
+    const transactions = await TransactionModel.find({ userId: userId }).sort({
+      date: -1,
+    });
     return transactions;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getTransactionById = async (id: string) => {
+  try {
+    await connectDB();
+    const res = await TransactionModel.findById(id);
+    console.log(res);
   } catch (error) {
     console.log(error);
   }
@@ -64,6 +77,33 @@ export const addTransaction = async (data: AddTransactionProps) => {
     } else {
       return { error: "An unexpected error occurred." };
     }
+  }
+};
+
+export const updateTransaction = async (
+  _id: string,
+  data: {
+    date: Date;
+    title: string;
+    amount: number;
+    category: string;
+  }
+) => {
+  const filter = { _id: _id };
+  const update = {
+    title: data.title,
+    amount: data.amount,
+    date: data.date,
+    category: data.category,
+  };
+  try {
+    await connectDB();
+    const res = await TransactionModel.findOneAndUpdate(filter, update);
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.log(error);
   }
 };
 

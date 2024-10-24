@@ -10,10 +10,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { deleteTransaction } from "@/app/server/actions/transactionControllers";
+import {
+  deleteTransaction,
+  getTransactionById,
+} from "@/app/server/actions/transactionControllers";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import EditTransaction from "./edit-transaction";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -21,7 +32,7 @@ import { toast } from "sonner";
 export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "title",
-    header: () => <div className="text-center">Title</div>,
+    header: () => <div className="text-left">Title</div>,
     cell: ({ row }) => {
       return (
         <div className="text-left font-medium">{row.getValue("title")}</div>
@@ -29,8 +40,17 @@ export const columns: ColumnDef<Transaction>[] = [
     },
   },
   {
+    accessorKey: "category",
+    header: () => <div className="text-left">Category</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-left font-medium">{row.getValue("category")}</div>
+      );
+    },
+  },
+  {
     accessorKey: "amount",
-    header: () => <div className="text-center">Amount</div>,
+    header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
       const formatted = new Intl.NumberFormat("en-US", {
@@ -51,18 +71,10 @@ export const columns: ColumnDef<Transaction>[] = [
       );
     },
   },
-  {
-    accessorKey: "category",
-    header: () => <div className="text-center">Category</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-left font-medium">{row.getValue("category")}</div>
-      );
-    },
-  },
+
   {
     accessorKey: "date",
-    header: () => <div className="text-center">Date</div>,
+    header: () => <div className="text-right">Date</div>,
     cell: ({ row }) => {
       const date: string = row.getValue("date");
       const formatted = date.slice(0, 10);
@@ -72,33 +84,33 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     id: "actions",
+    header: () => <div className="text-right">Edit / Delete</div>,
     cell: ({ row }) => {
       const transaction = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {/* TODO: Add an edit function */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  deleteTransaction(transaction._id);
-                  toast("Transaction Deleted");
-                }}
-              >
-                Delete
+        <div className="text-right">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost">
+                <Pencil />
               </Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <EditTransaction transaction={transaction} />
+            </PopoverContent>
+          </Popover>
+          <Button
+            className="text-red-600"
+            variant="ghost"
+            onClick={() => {
+              deleteTransaction(transaction._id);
+              toast("Transaction Deleted");
+            }}
+          >
+            <X />
+          </Button>
+        </div>
       );
     },
   },
